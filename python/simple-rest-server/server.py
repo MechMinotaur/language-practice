@@ -9,7 +9,7 @@ data_store = {
             "id": 1,
             "firstName": "Lorum",
             "lastName": "Ipsum",
-            "email": "lorum.imsum@email.com",
+            "email": "lorum.ipsum@email.com",
             "phoneNumber": "333-333-3333",
         },
         {
@@ -32,6 +32,13 @@ data_store = {
             "lastName": "George",
             "email": "bill.george@email.com",
             "phoneNumber": "222-222-2222",
+        },
+        {
+            "id": 5,
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john.doe@email.com",
+            "phoneNumber": "256-867-5309",
         },
     ]
 }
