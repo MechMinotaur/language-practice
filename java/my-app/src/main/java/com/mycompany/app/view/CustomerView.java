@@ -6,7 +6,7 @@ import com.mycompany.app.model.CustomerModel;
 
 public class CustomerView {
 
-    public void displayAllCustomers(List<CustomerModel> customers) {
+    public void displayCustomers(List<CustomerModel> customers) {
         for (CustomerModel customerModel : customers) {
             var output = """
                     %s %s

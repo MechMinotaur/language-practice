@@ -1,9 +1,6 @@
 package com.mycompany.app.controller;
 
-import java.util.List;
-
 import com.mycompany.app.model.CustomerDataAccessObject;
-import com.mycompany.app.model.CustomerModel;
 import com.mycompany.app.view.CustomerView;
 
 public class CustomerController {
@@ -15,8 +12,13 @@ public class CustomerController {
         this.customerView = customerView;
     }
 
-    public void displayAllCustomers() {
-        List<CustomerModel> customers = customerDAO.getAllCustomers();
-        customerView.displayAllCustomers(customers);
+    public void displayAllLocalCustomers() {
+        var customers = customerDAO.getAllLocalCustomers();
+        customerView.displayCustomers(customers);
+    }
+
+    public void displayAllRemoteCustomers() {
+        var customers = customerDAO.getAllRemoteCustomers();
+        customerView.displayCustomers(customers);
     }
 }

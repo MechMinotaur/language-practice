@@ -1,10 +1,5 @@
 package com.mycompany.app;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -69,35 +64,6 @@ public class App {
     return true;
   }
 
-  public static void GetCustomers() throws IOException {
-    /*
-     * TODO:
-     * Move this function out of main.
-     * Use JSON (GSON plugin) and HTTPRequest instead of HTTURLConnection.
-     * Query only clients that are missing data.
-     * Update our database with the new data.
-     */
-
-    URL url = new URL("http://localhost:5000/customers");
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setRequestMethod("GET");
-    conn.setRequestProperty("Accept", "application/json");
-
-    if (conn.getResponseCode() != 200) {
-      throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-    }
-
-    BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-    StringBuilder result = new StringBuilder();
-    String output;
-    while ((output = br.readLine()) != null) {
-      result.append(output);
-    }
-    System.out.println("Response: " + result.toString());
-    conn.disconnect();
-
-  }
-
   public static void main(String[] args) {
     if (!CreateDatabase()) {
       return;
@@ -119,14 +85,10 @@ public class App {
           execute = false;
           break;
         case "L":
-          controller.displayAllCustomers();
+          controller.displayAllLocalCustomers();
           break;
         case "U":
-          try {
-            GetCustomers();
-          } catch (IOException e) {
-            System.out.println("Failed to contact Python REST server.");
-          }
+          controller.displayAllRemoteCustomers();
           break;
         default:
           System.out.println("Unknown command.");
