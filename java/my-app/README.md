@@ -11,5 +11,6 @@ I followed the following guides:
 # Setup and Execution
 1. Install the latest JDK.
 1. Install Maven.
-1. Run `./build.sh`
-1. Run `./run.sh`
+1. To build run `mvn clean package`
+1. To execute run `mvn exec:java -Dexec.mainClass="com.mycompany.app.App"`
+1. To distribute run `mvn clean compile assembly:single`. This will create a single JAR that can be ran using `java -jar my-app-1.0-SNAPSHOT-jar-with-dependencies.jar`
