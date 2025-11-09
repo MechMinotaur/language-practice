@@ -40,23 +40,26 @@ data_store = {
 @app.route("/customers", methods=["GET"])
 def get_customers():
     """Returns all customers in the data_store."""
-    return jsonify(data_store["customers"])
+    firstName = request.args.get("firstName")
+    lastName = request.args.get("lastName")
+    email = request.args.get("email")
+    phoneNumber = request.args.get("phoneNumber")
 
+    results = []
 
-@app.route("/customers/<int:customer_id>", methods=["GET"])
-def get_customer(customer_id):
-    """Returns a specific customer by its ID."""
-    customer = next(
-        (
-            customer
-            for customer in data_store["customers"]
-            if customer["id"] == customer_id
-        ),
-        None,
-    )
-    if customer:
-        return jsonify(customer)
-    return jsonify({"message": "Customer not found"}), 404
+    for customer in data_store["customers"]:
+        firstNameMatch = firstName is None or firstName == customer["firstName"]
+        lastNameMatch = lastName is None or lastName == customer["lastName"]
+        emailMatch = email is None or email == customer["email"]
+        phoneNumberMatch = phoneNumber is None or phoneNumber == customer["phoneNumber"]
+
+        if firstNameMatch and lastNameMatch and emailMatch and phoneNumberMatch:
+            results.append(customer)
+
+    if not results:
+        return jsonify({"message": "Customer not found"}), 404
+
+    return jsonify(results)
 
 
 if __name__ == "__main__":
