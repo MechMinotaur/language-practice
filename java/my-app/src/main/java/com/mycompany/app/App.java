@@ -45,10 +45,15 @@ public class App {
       statement.executeUpdate(createTableSql);
 
       var insertCustomersSql = """
-          insert into customer(id, firstName, lastName, email)
-          values (1, 'leo', 'yui', 'leo.yui@email.com');
+          insert into customer(id, firstName, lastName, email, phoneNumber)
+          values
+            (1, 'Leo', 'Yui', 'leo.yui@email.com', '123-456-7890'),
+            (2, 'Bill', 'George', 'bill.george@email.com', null),
+            (3, 'Abcde', 'Hendrix', 'abcde.hendrix@email.com', '256-123-4567'),
+            (4, 'Lorum', 'Ipsum', 'lorum.ipsum@email.com', null);
           """;
       statement.executeUpdate(insertCustomersSql);
+
     } catch (SQLException e) {
       // if the error message is "out of memory",
       // it probably means no database file is found

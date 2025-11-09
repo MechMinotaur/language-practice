@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CustomerDAO {
     private String dbURL = "jdbc:sqlite:sample.db";
@@ -19,7 +20,7 @@ public class CustomerDAO {
                         resultSet.getString("firstName"),
                         resultSet.getString("lastName"),
                         resultSet.getString("email"),
-                        null));
+                        Optional.ofNullable(resultSet.getString("phoneNumber"))));
             }
         } catch (SQLException e) {
 
