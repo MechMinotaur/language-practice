@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 import com.mycompany.app.controller.CustomerController;
-import com.mycompany.app.model.CustomerDAO;
+import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
 
 /**
@@ -64,7 +64,7 @@ public class App {
 
   public static void main(String[] args) {
     CreateDatabase();
-    var dao = new CustomerDAO();
+    var dao = new CustomerDataAccessObject();
     var view = new CustomerView();
     var controller = new CustomerController(dao, view);
 

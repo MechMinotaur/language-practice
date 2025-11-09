@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomerDAO {
+public class CustomerDataAccessObject {
     private String dbURL = "jdbc:sqlite:sample.db";
 
     public List<CustomerModel> getAllCustomers() {
