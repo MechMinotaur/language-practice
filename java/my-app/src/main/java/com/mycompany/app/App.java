@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 import com.mycompany.app.controller.CustomerController;
 import com.mycompany.app.model.CustomerDAO;
@@ -66,6 +67,30 @@ public class App {
     var dao = new CustomerDAO();
     var view = new CustomerView();
     var controller = new CustomerController(dao, view);
-    controller.displayAllCustomers();
+
+    var scanner = new Scanner(System.in);
+    var execute = true;
+
+    while (execute) {
+      System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
+      var command = scanner.nextLine().toUpperCase();
+
+      switch (command) {
+        case "X":
+          execute = false;
+          break;
+        case "L":
+          controller.displayAllCustomers();
+          break;
+        case "U":
+          System.out.println("Request data from Python server.");
+          break;
+        default:
+          System.out.println("Unknown command.");
+          break;
+      }
+
+    }
+    scanner.close();
   }
 }
