@@ -1,5 +1,10 @@
 package com.mycompany.app;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,7 +19,7 @@ import com.mycompany.app.view.CustomerView;
  * Hello world!
  */
 public class App {
-  public static void CreateDatabase() {
+  public static boolean CreateDatabase() {
     // NOTE: Connection and Statement are AutoCloseable.
     // Don't forget to close them both in order to avoid leaks.
     try (
@@ -59,11 +64,45 @@ public class App {
       // if the error message is "out of memory",
       // it probably means no database file is found
       e.printStackTrace(System.err);
+      return false;
     }
+    return true;
+  }
+
+  public static void GetCustomers() throws IOException {
+    /*
+     * TODO:
+     * Move this function out of main.
+     * Use JSON (GSON plugin) and HTTPRequest instead of HTTURLConnection.
+     * Query only clients that are missing data.
+     * Update our database with the new data.
+     */
+
+    URL url = new URL("http://localhost:5000/customers");
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("Accept", "application/json");
+
+    if (conn.getResponseCode() != 200) {
+      throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+    }
+
+    BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+    StringBuilder result = new StringBuilder();
+    String output;
+    while ((output = br.readLine()) != null) {
+      result.append(output);
+    }
+    System.out.println("Response: " + result.toString());
+    conn.disconnect();
+
   }
 
   public static void main(String[] args) {
-    CreateDatabase();
+    if (!CreateDatabase()) {
+      return;
+    }
+
     var dao = new CustomerDataAccessObject();
     var view = new CustomerView();
     var controller = new CustomerController(dao, view);
@@ -83,7 +122,11 @@ public class App {
           controller.displayAllCustomers();
           break;
         case "U":
-          System.out.println("Request data from Python server.");
+          try {
+            GetCustomers();
+          } catch (IOException e) {
+            System.out.println("Failed to contact Python REST server.");
+          }
           break;
         default:
           System.out.println("Unknown command.");
