@@ -17,8 +17,8 @@ public class CustomerController {
         customerView.displayCustomers(customers);
     }
 
-    public void displayAllRemoteCustomers() {
-        var customers = customerDAO.getAllRemoteCustomers();
+    public void updateLocalCustomers() {
+        var customers = customerDAO.updateLocalCustomers();
         customerView.displayCustomers(customers);
     }
 }

@@ -88,7 +88,7 @@ public class App {
           controller.displayAllLocalCustomers();
           break;
         case "U":
-          controller.displayAllRemoteCustomers();
+          controller.updateLocalCustomers();
           break;
         default:
           System.out.println("Unknown command.");
