@@ -6,7 +6,8 @@ I followed the following guides:
 
 - Get a basic [Maven](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html) project up and running.
 - Setup a SQLite database following [these instructions](https://github.com/xerial/sqlite-jdbc). The Download section was essential for Maven.
-- Learned about `Record`, `var`, and `multi-line strings` [here](https://dev.to/adamthedeveloper/java-isnt-verbose-you-are-1di3).
+- Learned about `record`, `var`, and `multi-line strings` [here](https://dev.to/adamthedeveloper/java-isnt-verbose-you-are-1di3).
+- [This](https://youtu.be/9oq7Y8n1t00?si=BlucUhVeFVmZHwuX) video detailing how to call a REST API in Java.
 
 # Setup and Execution
 1. Install the latest JDK.
