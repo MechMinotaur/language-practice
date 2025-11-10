@@ -1,6 +1,7 @@
 package com.mycompany.app.model;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -12,10 +13,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
 public class CustomerDataAccessObject {
     private static String dbURL = "jdbc:sqlite:sample.db";
     private static String remoteURLString = "http://localhost:5000/customers";
     private HttpClient httpClient = HttpClient.newHttpClient();
+    private Gson gson = new Gson();
 
     private static CustomerModel From(ResultSet resultSet) throws SQLException {
         return new CustomerModel(
@@ -88,9 +94,12 @@ public class CustomerDataAccessObject {
                         .GET()
                         .build();
                 var response = httpClient.send(request, BodyHandlers.ofString());
+                Type listType = new TypeToken<List<CustomerModel>>() {
+                }.getType();
+                ArrayList<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
                 System.out.println(response.body());
             }
-        } catch (InterruptedException | IOException | SQLException | URISyntaxException e) {
+        } catch (InterruptedException | IOException | JsonSyntaxException | SQLException | URISyntaxException e) {
 
         }
 
