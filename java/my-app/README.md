@@ -16,9 +16,18 @@ I followed the following guides:
 1. To execute run `mvn exec:java -Dexec.mainClass="com.mycompany.app.App"`
 1. To distribute run `mvn clean compile assembly:single`. This will create a single JAR that can be ran using `java -jar my-app-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
+# User Story
+Company X has a database of several customers. Company Y, a larger company, also has a database of customers. Company X shares some of the same customers as Company Y. Create a Java App using the Model View Controller Architecture that allows Company X to achieve the following goals:
+ - Query Company Y's REST api to update customers missing details.
+ - Perform CRUD operations on Company X's database including.
+    - Creating the initial database.
+    - Reading and displaying the list of customers to the user.
+    - Updating Company X's database with missing entries upon receipt of Company Y's REST results.
+    - Delete the database each time to ensure consistency.
+ - Create a distributable JAR.
+ - Write unit tests which verify functionality and get as close to 100% coverage as possible.
+
 # TODO
-1. Describe what the app does. Consider a made up user story.
-1. Create a simple Python server that responds to REST requests.
 1. Send a REST request to the Python server from this app to update missing phone numbers.
 1. Create a unit test and automate it through github.
 1. Create section which describes development environment.
