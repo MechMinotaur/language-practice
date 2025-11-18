@@ -73,29 +73,21 @@ public class App {
     var view = new CustomerView();
     var controller = new CustomerController(dao, view);
 
-    var scanner = new Scanner(System.in);
-    var execute = true;
+    try (var scanner = new Scanner(System.in)) {
+      var execute = true;
 
-    while (execute) {
-      System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
-      var command = scanner.nextLine().toUpperCase();
+      while (execute) {
+        System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
+        var command = scanner.nextLine().toUpperCase();
 
-      switch (command) {
-        case "X":
-          execute = false;
-          break;
-        case "L":
-          controller.displayAllLocalCustomers();
-          break;
-        case "U":
-          controller.updateLocalCustomers();
-          break;
-        default:
-          System.out.println("Unknown command.");
-          break;
+        switch (command) {
+          case "X" -> execute = false;
+          case "L" -> controller.displayAllLocalCustomers();
+          case "U" -> controller.updateLocalCustomers();
+          default -> System.out.println("Unknown command.");
+        }
+
       }
-
     }
-    scanner.close();
   }
 }

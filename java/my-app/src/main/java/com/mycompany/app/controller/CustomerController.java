@@ -4,8 +4,8 @@ import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
 
 public class CustomerController {
-    private CustomerDataAccessObject customerDAO;
-    private CustomerView customerView;
+    private final CustomerDataAccessObject customerDAO;
+    private final CustomerView customerView;
 
     public CustomerController(CustomerDataAccessObject customerDAO, CustomerView customerView) {
         this.customerDAO = customerDAO;
