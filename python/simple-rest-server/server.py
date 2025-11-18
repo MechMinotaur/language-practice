@@ -46,22 +46,55 @@ data_store = {
 
 @app.route("/customers", methods=["GET"])
 def get_customers():
-    """Returns all customers in the data_store."""
-    firstName = request.args.get("firstName")
-    lastName = request.args.get("lastName")
-    email = request.args.get("email")
-    phoneNumber = request.args.get("phoneNumber")
+
+    def get_param_list(param_name):
+        """Return list of lowercase values if provided, else None."""
+        value = request.args.get(param_name)
+        if value:
+            return [v.strip().lower() for v in value.split(",")]
+        return None
+
+    # Extract query params (case-insensitive lists)
+    firstNames = get_param_list("firstName")
+    lastNames = get_param_list("lastName")
+    emails = get_param_list("email")
+    phoneNumbers = get_param_list("phoneNumber")
+
+    # AND (default) vs OR mode
+    mode = request.args.get("mode", "and").lower()
+    if mode not in ("and", "or"):
+        return jsonify({"message": "Invalid mode. Use 'and' or 'or'."}), 400
 
     results = []
 
     for customer in data_store["customers"]:
-        firstNameMatch = firstName is None or firstName == customer["firstName"]
-        lastNameMatch = lastName is None or lastName == customer["lastName"]
-        emailMatch = email is None or email == customer["email"]
-        phoneNumberMatch = phoneNumber is None or phoneNumber == customer["phoneNumber"]
+        # Prepare customer fields in lowercase for comparison
+        c_fn = customer["firstName"].lower()
+        c_ln = customer["lastName"].lower()
+        c_email = customer["email"].lower()
+        c_phone = customer["phoneNumber"].lower()
 
-        if firstNameMatch and lastNameMatch and emailMatch and phoneNumberMatch:
+        checks = []
+
+        if firstNames is not None:
+            checks.append(c_fn in firstNames)
+
+        if lastNames is not None:
+            checks.append(c_ln in lastNames)
+
+        if emails is not None:
+            checks.append(c_email in emails)
+
+        if phoneNumbers is not None:
+            checks.append(c_phone in phoneNumbers)
+
+        # Determine match based on AND/OR logic
+        if not checks:  # no filters at all
             results.append(customer)
+        else:
+            match = all(checks) if mode == "and" else any(checks)
+            if match:
+                results.append(customer)
 
     if not results:
         return jsonify({"message": "Customer not found"}), 404
