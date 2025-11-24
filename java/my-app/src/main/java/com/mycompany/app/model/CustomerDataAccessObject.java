@@ -28,6 +28,7 @@ public class CustomerDataAccessObject {
 
     private static CustomerModel From(ResultSet resultSet) throws SQLException {
         return new CustomerModel(
+                resultSet.getInt("social"),
                 resultSet.getString("firstName"),
                 resultSet.getString("lastName"),
                 resultSet.getString("email"),
@@ -98,7 +99,7 @@ public class CustomerDataAccessObject {
          * TODO:
          * Update our database with the new data.
          */
-        var nameCustomer = new HashMap<String, CustomerModel>();
+        var socialCustomer = new HashMap<Integer, CustomerModel>();
         var sqlString = """
                 select * from customer
                 where email is null or phoneNumber is null
@@ -109,9 +110,9 @@ public class CustomerDataAccessObject {
                 var resultSet = statement.executeQuery(sqlString)) {
             while (resultSet.next()) {
                 var customer = From(resultSet);
-                nameCustomer.put(customer.firstName(), customer);
+                socialCustomer.put(customer.social(), customer);
             }
-            var requestStr = UpdateRequestFrom(nameCustomer.values());
+            var requestStr = UpdateRequestFrom(socialCustomer.values());
             var request = HttpRequest.newBuilder()
                     .uri(new URI(requestStr))
                     .GET()
@@ -128,7 +129,7 @@ public class CustomerDataAccessObject {
 
         }
 
-        return nameCustomer.values();
+        return socialCustomer.values();
     }
 
 }

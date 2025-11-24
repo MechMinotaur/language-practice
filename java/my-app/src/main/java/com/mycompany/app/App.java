@@ -38,6 +38,7 @@ public class App {
       var createTableSql = """
           create table customer (
           id integer,
+          social integer,
           firstName text not null,
           lastName text not null,
           email text,
@@ -46,12 +47,12 @@ public class App {
       statement.executeUpdate(createTableSql);
 
       var insertCustomersSql = """
-          insert into customer(id, firstName, lastName, email, phoneNumber)
+          insert into customer(id, social, firstName, lastName, email, phoneNumber)
           values
-            (1, 'Leo', 'Yui', 'leo.yui@email.com', '123-456-7890'),
-            (2, 'Bill', 'George', 'bill.george@email.com', null),
-            (3, 'Abcde', 'Hendrix', 'abcde.hendrix@email.com', '256-123-4567'),
-            (4, 'Lorum', 'Ipsum', 'lorum.ipsum@email.com', null);
+            (1, 111111111, 'Leo', 'Yui', 'leo.yui@email.com', '123-456-7890'),
+            (2, 222222222, 'Bill', 'George', 'bill.george@email.com', null),
+            (3, 333333333, 'Abcde', 'Hendrix', 'abcde.hendrix@email.com', '256-123-4567'),
+            (4, 444444444, 'Lorum', 'Ipsum', 'lorum.ipsum@email.com', null);
           """;
       statement.executeUpdate(insertCustomersSql);
 
