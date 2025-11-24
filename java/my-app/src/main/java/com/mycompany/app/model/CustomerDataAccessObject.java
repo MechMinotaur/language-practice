@@ -35,39 +35,19 @@ public class CustomerDataAccessObject {
                 resultSet.getString("phoneNumber"));
     }
 
-    private static void AddFilter(String queryName, String[] values, List<String> filters) {
-        if (values.length > 0) {
-            filters.add(queryName + "=" + String.join(",", values));
-        }
-    }
-
     private static String UpdateRequestFrom(Collection<CustomerModel> customers) {
         var sb = new StringBuilder(REMOTEURL);
         var filters = new ArrayList<String>();
 
-        var firstNames = customers.stream()
-                .map(CustomerModel::firstName)
+        var values = customers.stream()
+                .map(CustomerModel::social)
+                .map(Object::toString)
                 .filter(Objects::nonNull)
                 .toArray(String[]::new);
-        AddFilter("firstName", firstNames, filters);
 
-        var lastNames = customers.stream()
-                .map(CustomerModel::lastName)
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
-        AddFilter("lastName", lastNames, filters);
-
-        var emails = customers.stream()
-                .map(CustomerModel::email)
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
-        AddFilter("email", emails, filters);
-
-        var phoneNumbers = customers.stream()
-                .map(CustomerModel::phoneNumber)
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
-        AddFilter("phoneNumber", phoneNumbers, filters);
+        if (values.length > 0) {
+            filters.add("social=" + String.join(",", values));
+        }
 
         if (!filters.isEmpty()) {
             sb.append("?");
@@ -99,7 +79,7 @@ public class CustomerDataAccessObject {
          * TODO:
          * Update our database with the new data.
          */
-        var socialCustomer = new HashMap<Integer, CustomerModel>();
+        var socialLocalCustomer = new HashMap<Integer, CustomerModel>();
         var sqlString = """
                 select * from customer
                 where email is null or phoneNumber is null
@@ -110,9 +90,9 @@ public class CustomerDataAccessObject {
                 var resultSet = statement.executeQuery(sqlString)) {
             while (resultSet.next()) {
                 var customer = From(resultSet);
-                socialCustomer.put(customer.social(), customer);
+                socialLocalCustomer.put(customer.social(), customer);
             }
-            var requestStr = UpdateRequestFrom(socialCustomer.values());
+            var requestStr = UpdateRequestFrom(socialLocalCustomer.values());
             var request = HttpRequest.newBuilder()
                     .uri(new URI(requestStr))
                     .GET()
@@ -129,7 +109,7 @@ public class CustomerDataAccessObject {
 
         }
 
-        return socialCustomer.values();
+        return socialLocalCustomer.values();
     }
 
 }
