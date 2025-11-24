@@ -7,7 +7,7 @@ data_store = {
     "customers": [
         {
             "id": 1,
-            "social": 444444444,
+            "social": "444444444",
             "firstName": "Lorum",
             "lastName": "Ipsum",
             "email": "lorum.ipsum@email.com",
@@ -15,7 +15,7 @@ data_store = {
         },
         {
             "id": 2,
-            "social": 333333333,
+            "social": "333333333",
             "firstName": "Abcde",
             "lastName": "Hendrix",
             "email": "abcde.hendrix@email.com",
@@ -23,7 +23,7 @@ data_store = {
         },
         {
             "id": 3,
-            "social": 111111111,
+            "social": "111111111",
             "firstName": "Leo",
             "lastName": "Yui",
             "email": "leo.yui@email.com",
@@ -31,7 +31,7 @@ data_store = {
         },
         {
             "id": 4,
-            "social": 222222222,
+            "social": "222222222",
             "firstName": "Bill",
             "lastName": "George",
             "email": "bill.george@email.com",
@@ -39,7 +39,7 @@ data_store = {
         },
         {
             "id": 5,
-            "social": 123456789,
+            "social": "123456789",
             "firstName": "John",
             "lastName": "Doe",
             "email": "john.doe@email.com",
@@ -75,7 +75,7 @@ def get_customers():
 
     for customer in data_store["customers"]:
         # Prepare customer fields in lowercase for comparison
-        c_so = customer["social"]
+        c_so = customer["social"].lower()
         c_fn = customer["firstName"].lower()
         c_ln = customer["lastName"].lower()
         c_email = customer["email"].lower()
