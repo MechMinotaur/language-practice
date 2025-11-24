@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -58,6 +59,25 @@ public class CustomerDataAccessObject {
         return sb.toString();
     }
 
+    private String GetUpdateCustomersSql(
+            HttpResponse<String> response,
+            HashMap<Integer, CustomerModel> localCustomers) {
+
+        Type listType = new TypeToken<List<CustomerModel>>() {
+        }.getType();
+        List<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
+
+        var sb = new StringBuilder();
+        for (CustomerModel remoteCustomer : customersResponse) {
+            var localCustomer = localCustomers.get(remoteCustomer.social());
+
+            var updatedCustomer = CustomerModel.FromRemote(localCustomer, remoteCustomer);
+            sb.append(updatedCustomer.toString());
+        }
+
+        return sb.toString();
+    }
+
     public List<CustomerModel> getAllLocalCustomers() {
         List<CustomerModel> customers = new ArrayList<>();
         try (
@@ -99,12 +119,8 @@ public class CustomerDataAccessObject {
                     .build();
 
             var response = httpClient.send(request, BodyHandlers.ofString());
-            Type listType = new TypeToken<List<CustomerModel>>() {
-            }.getType();
-            List<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
-            for (CustomerModel customerModel : customersResponse) {
-                System.out.println(customerModel.firstName());
-            }
+            var updateSql = GetUpdateCustomersSql(response, socialLocalCustomer);
+
         } catch (InterruptedException | IOException | JsonSyntaxException | SQLException | URISyntaxException e) {
 
         }
