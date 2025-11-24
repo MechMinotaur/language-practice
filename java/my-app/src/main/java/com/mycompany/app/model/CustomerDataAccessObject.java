@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +40,7 @@ public class CustomerDataAccessObject {
         }
     }
 
-    private static String UpdateRequestFrom(List<CustomerModel> customers) {
+    private static String UpdateRequestFrom(Collection<CustomerModel> customers) {
         var sb = new StringBuilder(REMOTEURL);
         var filters = new ArrayList<String>();
 
@@ -91,12 +93,12 @@ public class CustomerDataAccessObject {
         return customers;
     }
 
-    public List<CustomerModel> updateLocalCustomers() {
+    public Iterable<CustomerModel> updateLocalCustomers() {
         /*
          * TODO:
          * Update our database with the new data.
          */
-        List<CustomerModel> customers = new ArrayList<>();
+        var nameCustomer = new HashMap<String, CustomerModel>();
         var sqlString = """
                 select * from customer
                 where email is null or phoneNumber is null
@@ -106,9 +108,10 @@ public class CustomerDataAccessObject {
                 var statement = connection.createStatement();
                 var resultSet = statement.executeQuery(sqlString)) {
             while (resultSet.next()) {
-                customers.add(From(resultSet));
+                var customer = From(resultSet);
+                nameCustomer.put(customer.firstName(), customer);
             }
-            var requestStr = UpdateRequestFrom(customers);
+            var requestStr = UpdateRequestFrom(nameCustomer.values());
             var request = HttpRequest.newBuilder()
                     .uri(new URI(requestStr))
                     .GET()
@@ -125,7 +128,7 @@ public class CustomerDataAccessObject {
 
         }
 
-        return customers;
+        return nameCustomer.values();
     }
 
 }
