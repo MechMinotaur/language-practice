@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.mycompany.app.controller.CustomerController;
+import com.mycompany.app.controller.MainController;
 import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
 import com.mycompany.app.view.EventView;
@@ -80,27 +81,10 @@ public class App {
                 new Gson());
         var customerView = new CustomerView(logger);
         var eventView = new EventView(logger);
-        var controller = new CustomerController(dao, customerView, eventView);
+        var customerController = new CustomerController(dao, customerView, eventView);
 
-        try (var scanner = new Scanner(System.in)) {
-            var execute = true;
+        var mainController = new MainController(customerController, eventView);
 
-            while (execute) {
-                logger.info("Enter 'X' to exit 'L' to list and 'U' to update database.");
-                var command = scanner.nextLine().toUpperCase();
-
-                switch (command) {
-                    case "X" ->
-                        execute = false;
-                    case "L" ->
-                        controller.displayAllLocalCustomers();
-                    case "U" ->
-                        controller.updateLocalCustomers();
-                    default ->
-                        logger.warning("Unknown command.");
-                }
-
-            }
-        }
+        mainController.StartMainLoop();
     }
 }

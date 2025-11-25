@@ -13,4 +13,12 @@ public class EventView {
     public void LogException(String sourceClass, String sourceMethod, Throwable thrown) {
         this.logger.throwing(sourceClass, sourceMethod, thrown);
     }
+
+    public void LogInfo(String information) {
+        this.logger.info(information);
+    }
+
+    public void LogWarning(String warning) {
+        this.logger.warning(warning);
+    }
 }
