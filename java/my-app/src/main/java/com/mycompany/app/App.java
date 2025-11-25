@@ -6,15 +6,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.mycompany.app.controller.CustomerController;
 import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
 
-/**
- * Hello world!
- */
 public class App {
 
     public static boolean CreateDatabase() {
@@ -68,6 +66,8 @@ public class App {
     }
 
     public static void main(String[] args) {
+        var logger = Logger.getGlobal();
+
         if (!CreateDatabase()) {
             return;
         }
@@ -77,14 +77,14 @@ public class App {
                 "http://localhost:5000/customers",
                 HttpClient.newHttpClient(),
                 new Gson());
-        var view = new CustomerView();
+        var view = new CustomerView(logger);
         var controller = new CustomerController(dao, view);
 
         try (var scanner = new Scanner(System.in)) {
             var execute = true;
 
             while (execute) {
-                System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
+                logger.info("Enter 'X' to exit 'L' to list and 'U' to update database.");
                 var command = scanner.nextLine().toUpperCase();
 
                 switch (command) {
@@ -95,7 +95,7 @@ public class App {
                     case "U" ->
                         controller.updateLocalCustomers();
                     default ->
-                        System.out.println("Unknown command.");
+                        logger.warning("Unknown command.");
                 }
 
             }
