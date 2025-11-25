@@ -1,11 +1,13 @@
 package com.mycompany.app;
 
+import java.net.http.HttpClient;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import com.google.gson.Gson;
 import com.mycompany.app.controller.CustomerController;
 import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
@@ -14,16 +16,16 @@ import com.mycompany.app.view.CustomerView;
  * Hello world!
  */
 public class App {
-  public static boolean CreateDatabase() {
-    // NOTE: Connection and Statement are AutoCloseable.
-    // Don't forget to close them both in order to avoid leaks.
-    try (
-        // create a database connection
-        Connection connection = DriverManager.getConnection("jdbc:sqlite:sample.db");
-        Statement statement = connection.createStatement();) {
-      statement.setQueryTimeout(30); // set timeout to 30 sec.
 
-      var deleteDbSql = """
+    public static boolean CreateDatabase() {
+        // NOTE: Connection and Statement are AutoCloseable.
+        // Don't forget to close them both in order to avoid leaks.
+        try (
+                // create a database connection
+                Connection connection = DriverManager.getConnection("jdbc:sqlite:sample.db"); Statement statement = connection.createStatement();) {
+            statement.setQueryTimeout(30); // set timeout to 30 sec.
+
+            var deleteDbSql = """
           -- Source - https://stackoverflow.com/a
           -- Posted by Bernardo Ramos, modified by community. See post 'Timeline' for change history
           -- Retrieved 2025-11-08, License - CC BY-SA 4.0
@@ -33,9 +35,9 @@ public class App {
           VACUUM;
           PRAGMA integrity_check;
           """;
-      statement.executeUpdate(deleteDbSql);
+            statement.executeUpdate(deleteDbSql);
 
-      var createTableSql = """
+            var createTableSql = """
           create table customer (
           id integer,
           social integer,
@@ -44,9 +46,9 @@ public class App {
           email text,
           phoneNumber text
           );""";
-      statement.executeUpdate(createTableSql);
+            statement.executeUpdate(createTableSql);
 
-      var insertCustomersSql = """
+            var insertCustomersSql = """
           insert into customer(id, social, firstName, lastName, email, phoneNumber)
           values
             (1, 111111111, 'Leo', 'Yui', 'leo.yui@email.com', '123-456-7890'),
@@ -54,41 +56,49 @@ public class App {
             (3, 333333333, 'Abcde', 'Hendrix', 'abcde.hendrix@email.com', '256-123-4567'),
             (4, 444444444, 'Lorum', 'Ipsum', 'lorum.ipsum@email.com', null);
           """;
-      statement.executeUpdate(insertCustomersSql);
+            statement.executeUpdate(insertCustomersSql);
 
-    } catch (SQLException e) {
-      // if the error message is "out of memory",
-      // it probably means no database file is found
-      e.printStackTrace(System.err);
-      return false;
-    }
-    return true;
-  }
-
-  public static void main(String[] args) {
-    if (!CreateDatabase()) {
-      return;
+        } catch (SQLException e) {
+            // if the error message is "out of memory",
+            // it probably means no database file is found
+            e.printStackTrace(System.err);
+            return false;
+        }
+        return true;
     }
 
-    var dao = new CustomerDataAccessObject();
-    var view = new CustomerView();
-    var controller = new CustomerController(dao, view);
-
-    try (var scanner = new Scanner(System.in)) {
-      var execute = true;
-
-      while (execute) {
-        System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
-        var command = scanner.nextLine().toUpperCase();
-
-        switch (command) {
-          case "X" -> execute = false;
-          case "L" -> controller.displayAllLocalCustomers();
-          case "U" -> controller.updateLocalCustomers();
-          default -> System.out.println("Unknown command.");
+    public static void main(String[] args) {
+        if (!CreateDatabase()) {
+            return;
         }
 
-      }
+        var dao = new CustomerDataAccessObject(
+                "jdbc:sqlite:sample.db",
+                "http://localhost:5000/customers",
+                HttpClient.newHttpClient(),
+                new Gson());
+        var view = new CustomerView();
+        var controller = new CustomerController(dao, view);
+
+        try (var scanner = new Scanner(System.in)) {
+            var execute = true;
+
+            while (execute) {
+                System.out.println("Enter 'X' to exit 'L' to list and 'U' to update database.");
+                var command = scanner.nextLine().toUpperCase();
+
+                switch (command) {
+                    case "X" ->
+                        execute = false;
+                    case "L" ->
+                        controller.displayAllLocalCustomers();
+                    case "U" ->
+                        controller.updateLocalCustomers();
+                    default ->
+                        System.out.println("Unknown command.");
+                }
+
+            }
+        }
     }
-  }
 }

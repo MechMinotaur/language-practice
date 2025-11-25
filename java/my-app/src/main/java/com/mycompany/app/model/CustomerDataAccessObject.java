@@ -22,10 +22,18 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class CustomerDataAccessObject {
-    private static final String DBURL = "jdbc:sqlite:sample.db";
-    private static final String REMOTEURL = "http://localhost:5000/customers";
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final Gson gson = new Gson();
+
+    private final String localDatabaseUrl;
+    private final String remoteRestUrl;
+    private final HttpClient httpClient;
+    private final Gson gson;
+
+    public CustomerDataAccessObject(String localDatabaseUrl, String remoteRestUrl, HttpClient httpClient, Gson gson) {
+        this.localDatabaseUrl = localDatabaseUrl;
+        this.remoteRestUrl = remoteRestUrl;
+        this.httpClient = httpClient;
+        this.gson = gson;
+    }
 
     private static CustomerModel From(ResultSet resultSet) throws SQLException {
         return new CustomerModel(
@@ -36,8 +44,8 @@ public class CustomerDataAccessObject {
                 resultSet.getString("phoneNumber"));
     }
 
-    private static String CreateUpdateRequestFrom(Iterable<Integer> socials) {
-        var sb = new StringBuilder(REMOTEURL);
+    private String CreateUpdateRequestFrom(Iterable<Integer> socials) {
+        var sb = new StringBuilder(remoteRestUrl);
 
         sb.append("?&social=");
 
@@ -87,9 +95,7 @@ public class CustomerDataAccessObject {
     public List<CustomerModel> getAllLocalCustomers() {
         List<CustomerModel> customers = new ArrayList<>();
         try (
-                var connection = DriverManager.getConnection(DBURL);
-                var statement = connection.createStatement();
-                var resultSet = statement.executeQuery("select * from customer")) {
+                var connection = DriverManager.getConnection(localDatabaseUrl); var statement = connection.createStatement(); var resultSet = statement.executeQuery("select * from customer")) {
             while (resultSet.next()) {
                 customers.add(From(resultSet));
             }
@@ -107,9 +113,7 @@ public class CustomerDataAccessObject {
                 where email is null or phoneNumber is null
                 """;
         try (
-                var connection = DriverManager.getConnection(DBURL);
-                var statement = connection.createStatement();
-                var resultSet = statement.executeQuery(sqlString)) {
+                var connection = DriverManager.getConnection(localDatabaseUrl); var statement = connection.createStatement(); var resultSet = statement.executeQuery(sqlString)) {
             while (resultSet.next()) {
                 socials.add(resultSet.getInt("social"));
             }
