@@ -6,6 +6,7 @@ import com.mycompany.app.model.CustomerModel;
 
 public class CustomerView {
 
+    @SuppressWarnings("NonConstantLogger")
     private final Logger logger;
 
     public CustomerView(Logger logger) {

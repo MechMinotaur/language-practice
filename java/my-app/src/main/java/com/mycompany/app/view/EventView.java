@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 public class EventView {
 
+    @SuppressWarnings("NonConstantLogger")
     private final Logger logger;
 
     public EventView(Logger logger) {
