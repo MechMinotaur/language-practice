@@ -6,8 +6,8 @@ import com.mycompany.app.view.EventView;
 
 public class MainController {
 
-    private CustomerController customerController;
-    private EventView eventView;
+    private final CustomerController customerController;
+    private final EventView eventView;
 
     public MainController(CustomerController customerController, EventView eventView) {
         this.customerController = customerController;

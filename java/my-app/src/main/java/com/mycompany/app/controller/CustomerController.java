@@ -1,5 +1,10 @@
 package com.mycompany.app.controller;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
+
+import com.google.gson.JsonSyntaxException;
 import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.model.CustomerModel;
 import com.mycompany.app.view.CustomerView;
@@ -21,7 +26,7 @@ public class CustomerController {
         Iterable<CustomerModel> customers;
         try {
             customers = customerDAO.getAllLocalCustomers();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             this.eventView.LogException(this.customerDAO.getClass().toString(), "getAllLocalCustomers", e);
             return;
         }
@@ -33,7 +38,7 @@ public class CustomerController {
         int customersUpdated;
         try {
             customersUpdated = customerDAO.updateLocalCustomers();
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException | InterruptedException | URISyntaxException | SQLException e) {
             this.eventView.LogException(this.customerDAO.getClass().toString(), "updateLocalCustomers", e);
             return;
         }
