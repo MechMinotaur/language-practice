@@ -17,8 +17,8 @@ I followed the following guides:
 1. To distribute run `mvn clean compile assembly:single`. This will create a single JAR that can be ran using `java -jar my-app-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
 # User Story
-Company X has a database of several customers. Company Y, a larger company, also has a database of customers. Company X shares some of the same customers as Company Y. Create a Java App using the Model View Controller Architecture that allows Company X to achieve the following goals:
- - Query Company Y's REST api to update customers missing details.
+Company X has a database of several customers. Company Y, a larger company, also has a database of customers. Company X shares some of the same customers as Company Y. These customers can be uniquely identified by their social security number which both X and Y have access to. Create a Java App using the Model View Controller Architecture that allows Company X to achieve the following goals:
+ - Query Company Y's REST api and to get customer's missing phone numbers and email addresses.
  - Perform CRUD operations on Company X's database including.
     - Creating the initial database.
     - Reading and displaying the list of customers to the user.
@@ -27,7 +27,16 @@ Company X has a database of several customers. Company Y, a larger company, also
  - Create a distributable JAR.
  - Write unit tests which verify functionality and get as close to 100% coverage as possible.
 
+# Development Environment
+ - Visual Studio Code with the following Extensions:
+   - XML by Red Hat
+   - Java by Oracle
+   - Code Spell Checker by Street Side Software
+ - openjdk version 25.0.1
+ - Apache Maven 3.9.11
+ - git version 2.52.0
+ - GitHub.com
+ - CachyOS Linux 6.17.8-2
+
 # TODO
-1. Send a REST request to the Python server from this app to update missing phone numbers.
 1. Create a unit test and automate it through github.
-1. Create section which describes development environment.
