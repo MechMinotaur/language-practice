@@ -18,4 +18,8 @@ public class CustomerView {
             System.out.println(output);
         }
     }
+
+    public void displayNumberCustomersUpdated(int updated) {
+        System.out.println("%d customers updated.".formatted(updated));
+    }
 }

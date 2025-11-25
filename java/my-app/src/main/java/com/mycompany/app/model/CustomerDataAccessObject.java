@@ -100,11 +100,7 @@ public class CustomerDataAccessObject {
         return customers;
     }
 
-    public void updateLocalCustomers() {
-        /*
-         * TODO:
-         * Update our database with the new data.
-         */
+    public int updateLocalCustomers() {
         var socials = new ArrayList<Integer>();
         var sqlString = """
                 select social from customer
@@ -119,7 +115,7 @@ public class CustomerDataAccessObject {
             }
 
             if (socials.isEmpty()) {
-                return;
+                return 0;
             }
 
             var requestStr = CreateUpdateRequestFrom(socials);
@@ -147,7 +143,10 @@ public class CustomerDataAccessObject {
 
         } catch (InterruptedException | IOException | JsonSyntaxException | SQLException | URISyntaxException e) {
             System.out.println(e);
+            return 0;
         }
+
+        return socials.size();
     }
 
 }

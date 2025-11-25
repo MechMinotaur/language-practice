@@ -18,7 +18,7 @@ public class CustomerController {
     }
 
     public void updateLocalCustomers() {
-        customerDAO.updateLocalCustomers();
-        // customerView.displayCustomers(customers);
+        var customersUpdated = customerDAO.updateLocalCustomers();
+        customerView.displayNumberCustomersUpdated(customersUpdated);
     }
 }
