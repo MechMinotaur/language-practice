@@ -92,49 +92,51 @@ public class CustomerDataAccessObject {
         return sb.toString();
     }
 
-    public List<CustomerModel> getAllLocalCustomers() {
+    public List<CustomerModel> getAllLocalCustomers() throws SQLException {
         List<CustomerModel> customers = new ArrayList<>();
-        try (
-                var connection = DriverManager.getConnection(localDatabaseUrl); var statement = connection.createStatement(); var resultSet = statement.executeQuery("select * from customer")) {
-            while (resultSet.next()) {
-                customers.add(From(resultSet));
-            }
-        } catch (SQLException e) {
+        var connection = DriverManager.getConnection(localDatabaseUrl);
+        var statement = connection.createStatement();
+        var resultSet = statement.executeQuery("select * from customer");
 
+        while (resultSet.next()) {
+            customers.add(From(resultSet));
         }
 
         return customers;
     }
 
-    public int updateLocalCustomers() {
+    public int updateLocalCustomers() throws InterruptedException, IOException, JsonSyntaxException, SQLException, URISyntaxException {
         var socials = new ArrayList<Integer>();
         var sqlString = """
                 select social from customer
                 where email is null or phoneNumber is null
                 """;
-        try (
-                var connection = DriverManager.getConnection(localDatabaseUrl); var statement = connection.createStatement(); var resultSet = statement.executeQuery(sqlString)) {
-            while (resultSet.next()) {
-                socials.add(resultSet.getInt("social"));
-            }
 
-            if (socials.isEmpty()) {
-                return 0;
-            }
+        var connection = DriverManager.getConnection(localDatabaseUrl);
+        var statement = connection.createStatement();
+        var resultSet = statement.executeQuery(sqlString);
 
-            var requestStr = CreateUpdateRequestFrom(socials);
+        while (resultSet.next()) {
+            socials.add(resultSet.getInt("social"));
+        }
 
-            var request = HttpRequest.newBuilder()
-                    .uri(new URI(requestStr))
-                    .GET()
-                    .build();
+        if (socials.isEmpty()) {
+            return 0;
+        }
 
-            var response = httpClient.send(request, BodyHandlers.ofString());
-            var stageUpdatesSql = GetStageUpdatesSql(response);
+        var requestStr = CreateUpdateRequestFrom(socials);
 
-            statement.executeUpdate(stageUpdatesSql);
+        var request = HttpRequest.newBuilder()
+                .uri(new URI(requestStr))
+                .GET()
+                .build();
 
-            var updateSql = """
+        var response = httpClient.send(request, BodyHandlers.ofString());
+        var stageUpdatesSql = GetStageUpdatesSql(response);
+
+        statement.executeUpdate(stageUpdatesSql);
+
+        var updateSql = """
                     update customer
                     set
                         phoneNumber = coalesce(customer.phoneNumber, updatesStaging.newPhoneNumber),
@@ -143,12 +145,7 @@ public class CustomerDataAccessObject {
                     where customer.social = updatesStaging.social
                     """;
 
-            statement.executeUpdate(updateSql);
-
-        } catch (InterruptedException | IOException | JsonSyntaxException | SQLException | URISyntaxException e) {
-            System.out.println(e);
-            return 0;
-        }
+        statement.executeUpdate(updateSql);
 
         return socials.size();
     }

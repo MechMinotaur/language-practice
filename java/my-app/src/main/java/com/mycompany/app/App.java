@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.mycompany.app.controller.CustomerController;
 import com.mycompany.app.model.CustomerDataAccessObject;
 import com.mycompany.app.view.CustomerView;
+import com.mycompany.app.view.EventView;
 
 public class App {
 
@@ -77,8 +78,9 @@ public class App {
                 "http://localhost:5000/customers",
                 HttpClient.newHttpClient(),
                 new Gson());
-        var view = new CustomerView(logger);
-        var controller = new CustomerController(dao, view);
+        var customerView = new CustomerView(logger);
+        var eventView = new EventView(logger);
+        var controller = new CustomerController(dao, customerView, eventView);
 
         try (var scanner = new Scanner(System.in)) {
             var execute = true;
