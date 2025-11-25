@@ -12,10 +12,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Stack;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -36,44 +36,50 @@ public class CustomerDataAccessObject {
                 resultSet.getString("phoneNumber"));
     }
 
-    private static String UpdateRequestFrom(Collection<CustomerModel> customers) {
+    private static String CreateUpdateRequestFrom(Iterable<Integer> socials) {
         var sb = new StringBuilder(REMOTEURL);
-        var filters = new ArrayList<String>();
 
-        var values = customers.stream()
-                .map(CustomerModel::social)
-                .map(Object::toString)
-                .filter(Objects::nonNull)
-                .toArray(String[]::new);
+        sb.append("?&social=");
 
-        if (values.length > 0) {
-            filters.add("social=" + String.join(",", values));
-        }
+        var socialsString = StreamSupport.stream(socials.spliterator(), false)
+                .map(String::valueOf)
+                .collect((Collectors.joining(",")));
+        sb.append(socialsString);
 
-        if (!filters.isEmpty()) {
-            sb.append("?");
-            sb.append(String.join("&", filters));
-            sb.append("&mode=OR");
-        }
+        sb.append("&mode=OR");
 
         return sb.toString();
     }
 
-    private String GetUpdateCustomersSql(
-            HttpResponse<String> response,
-            HashMap<Integer, CustomerModel> localCustomers) {
+    private String GetStageUpdatesSql(HttpResponse<String> response) {
 
-        Type listType = new TypeToken<List<CustomerModel>>() {
+        Type listType = new TypeToken<Stack<CustomerModel>>() {
         }.getType();
-        List<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
+        Stack<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
 
-        var sb = new StringBuilder();
-        for (CustomerModel remoteCustomer : customersResponse) {
-            var localCustomer = localCustomers.get(remoteCustomer.social());
+        var stagingSql = """
+                create temp table updatesStaging (
+                social integer not null,
+                newEmail text,
+                newPhoneNumber text);
+                """;
 
-            var updatedCustomer = CustomerModel.FromRemote(localCustomer, remoteCustomer);
-            sb.append(updatedCustomer.toString());
+        var sb = new StringBuilder(stagingSql);
+
+        sb.append("insert into updatesStaging (social, newEmail, newPhoneNumber) values");
+
+        while (!customersResponse.isEmpty()) {
+            var remoteCustomer = customersResponse.pop();
+            sb.append(String.format("(%d, '%s', '%s')",
+                    remoteCustomer.social(),
+                    remoteCustomer.email(),
+                    remoteCustomer.phoneNumber()));
+            if (!customersResponse.isEmpty()) {
+                sb.append(",");
+            }
         }
+
+        sb.append(";");
 
         return sb.toString();
     }
@@ -94,14 +100,14 @@ public class CustomerDataAccessObject {
         return customers;
     }
 
-    public Iterable<CustomerModel> updateLocalCustomers() {
+    public void updateLocalCustomers() {
         /*
          * TODO:
          * Update our database with the new data.
          */
-        var socialLocalCustomer = new HashMap<Integer, CustomerModel>();
+        var socials = new ArrayList<Integer>();
         var sqlString = """
-                select * from customer
+                select social from customer
                 where email is null or phoneNumber is null
                 """;
         try (
@@ -109,23 +115,39 @@ public class CustomerDataAccessObject {
                 var statement = connection.createStatement();
                 var resultSet = statement.executeQuery(sqlString)) {
             while (resultSet.next()) {
-                var customer = From(resultSet);
-                socialLocalCustomer.put(customer.social(), customer);
+                socials.add(resultSet.getInt("social"));
             }
-            var requestStr = UpdateRequestFrom(socialLocalCustomer.values());
+
+            if (socials.isEmpty()) {
+                return;
+            }
+
+            var requestStr = CreateUpdateRequestFrom(socials);
+
             var request = HttpRequest.newBuilder()
                     .uri(new URI(requestStr))
                     .GET()
                     .build();
 
             var response = httpClient.send(request, BodyHandlers.ofString());
-            var updateSql = GetUpdateCustomersSql(response, socialLocalCustomer);
+            var stageUpdatesSql = GetStageUpdatesSql(response);
+
+            statement.executeUpdate(stageUpdatesSql);
+
+            var updateSql = """
+                    update customer
+                    set
+                        phoneNumber = coalesce(customer.phoneNumber, updatesStaging.newPhoneNumber),
+                        email = coalesce(customer.email, updatesStaging.newEmail)
+                    from updatesStaging
+                    where customer.social = updatesStaging.social
+                    """;
+
+            statement.executeUpdate(updateSql);
 
         } catch (InterruptedException | IOException | JsonSyntaxException | SQLException | URISyntaxException e) {
-
+            System.out.println(e);
         }
-
-        return socialLocalCustomer.values();
     }
 
 }
