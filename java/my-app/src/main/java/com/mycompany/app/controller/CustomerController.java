@@ -10,7 +10,7 @@ import com.mycompany.app.model.CustomerModel;
 import com.mycompany.app.view.CustomerDisplay;
 import com.mycompany.app.view.EventDisplay;
 
-public class CustomerController {
+public class CustomerController implements CustomerManager {
 
     private final CustomerDataAccessor customerDAO;
     private final CustomerDisplay customerView;
@@ -22,6 +22,7 @@ public class CustomerController {
         this.eventView = eventView;
     }
 
+    @Override
     public void displayAllLocalCustomers() {
         Iterable<CustomerModel> customers;
         try {
@@ -34,6 +35,7 @@ public class CustomerController {
         customerView.displayCustomers(customers);
     }
 
+    @Override
     public void updateLocalCustomers() {
         int customersUpdated;
         try {

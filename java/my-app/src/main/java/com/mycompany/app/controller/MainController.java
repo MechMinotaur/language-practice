@@ -2,14 +2,15 @@ package com.mycompany.app.controller;
 
 import java.util.Scanner;
 
+import com.mycompany.app.view.EventDisplay;
 import com.mycompany.app.view.EventView;
 
 public class MainController {
 
-    private final CustomerController customerController;
-    private final EventView eventView;
+    private final CustomerManager customerController;
+    private final EventDisplay eventView;
 
-    public MainController(CustomerController customerController, EventView eventView) {
+    public MainController(CustomerManager customerController, EventDisplay eventView) {
         this.customerController = customerController;
         this.eventView = eventView;
     }
