@@ -3,7 +3,6 @@ package com.mycompany.app.controller;
 import java.util.Scanner;
 
 import com.mycompany.app.view.EventDisplay;
-import com.mycompany.app.view.EventView;
 
 public class MainController {
 
