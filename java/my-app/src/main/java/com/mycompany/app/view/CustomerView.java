@@ -15,6 +15,10 @@ public class CustomerView implements CustomerDisplay {
 
     @Override
     public void displayCustomers(Iterable<CustomerModel> customers) {
+        if (customers == null) {
+            throw new NullPointerException("Customers cannot be null.");
+        }
+
         for (CustomerModel customerModel : customers) {
             var output = """
                     %s %s
