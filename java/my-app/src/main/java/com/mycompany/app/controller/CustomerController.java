@@ -5,18 +5,18 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import com.google.gson.JsonSyntaxException;
-import com.mycompany.app.model.CustomerDataAccessObject;
+import com.mycompany.app.model.CustomerDataAccessor;
 import com.mycompany.app.model.CustomerModel;
-import com.mycompany.app.view.CustomerView;
-import com.mycompany.app.view.EventView;
+import com.mycompany.app.view.CustomerDisplay;
+import com.mycompany.app.view.EventDisplay;
 
 public class CustomerController {
 
-    private final CustomerDataAccessObject customerDAO;
-    private final CustomerView customerView;
-    private final EventView eventView;
+    private final CustomerDataAccessor customerDAO;
+    private final CustomerDisplay customerView;
+    private final EventDisplay eventView;
 
-    public CustomerController(CustomerDataAccessObject customerDAO, CustomerView customerView, EventView eventView) {
+    public CustomerController(CustomerDataAccessor customerDAO, CustomerDisplay customerView, EventDisplay eventView) {
         this.customerDAO = customerDAO;
         this.customerView = customerView;
         this.eventView = eventView;
