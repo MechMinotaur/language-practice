@@ -2,7 +2,7 @@ package com.mycompany.app.view;
 
 import java.util.logging.Logger;
 
-public class EventView {
+public class EventView implements EventDisplay {
 
     @SuppressWarnings("NonConstantLogger")
     private final Logger logger;
@@ -11,14 +11,17 @@ public class EventView {
         this.logger = logger;
     }
 
+    @Override
     public void LogException(String sourceClass, String sourceMethod, Throwable thrown) {
         this.logger.throwing(sourceClass, sourceMethod, thrown);
     }
 
+    @Override
     public void LogInfo(String information) {
         this.logger.info(information);
     }
 
+    @Override
     public void LogWarning(String warning) {
         this.logger.warning(warning);
     }
