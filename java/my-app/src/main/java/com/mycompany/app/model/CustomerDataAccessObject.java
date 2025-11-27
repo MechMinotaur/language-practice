@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-public class CustomerDataAccessObject {
+public class CustomerDataAccessObject implements CustomerDataAccessor {
 
     private final String localDatabaseUrl;
     private final String remoteRestUrl;
@@ -92,8 +92,9 @@ public class CustomerDataAccessObject {
         return sb.toString();
     }
 
+    @Override
     public List<CustomerModel> getAllLocalCustomers() throws SQLException {
-        List<CustomerModel> customers = new ArrayList<>();
+        var customers = new ArrayList<CustomerModel>();
         var connection = DriverManager.getConnection(localDatabaseUrl);
         var statement = connection.createStatement();
         var resultSet = statement.executeQuery("select * from customer");
@@ -105,6 +106,7 @@ public class CustomerDataAccessObject {
         return customers;
     }
 
+    @Override
     public int updateLocalCustomers() throws InterruptedException, IOException, JsonSyntaxException, SQLException, URISyntaxException {
         var socials = new ArrayList<Integer>();
         var sqlString = """
