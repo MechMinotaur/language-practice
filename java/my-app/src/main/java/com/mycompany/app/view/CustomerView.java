@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import com.mycompany.app.model.CustomerModel;
 
-public class CustomerView {
+public class CustomerView implements CustomerDisplay {
 
     @SuppressWarnings("NonConstantLogger")
     private final Logger logger;
@@ -13,6 +13,7 @@ public class CustomerView {
         this.logger = logger;
     }
 
+    @Override
     public void displayCustomers(Iterable<CustomerModel> customers) {
         for (CustomerModel customerModel : customers) {
             var output = """
@@ -28,6 +29,7 @@ public class CustomerView {
         }
     }
 
+    @Override
     public void displayNumberCustomersUpdated(int updated) {
         this.logger.info("%d customers updated.".formatted(updated));
     }
