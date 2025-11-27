@@ -28,15 +28,15 @@ Company X has a database of several customers. Company Y, a larger company, also
  - Write unit tests which verify functionality and get as close to 100% coverage as possible.
 
 # Development Environment
- - Visual Studio Code with the following Extensions:
-   - XML by Red Hat
-   - Java by Oracle
-   - Code Spell Checker by Street Side Software
- - openjdk version 25.0.1
- - Apache Maven 3.9.11
- - git version 2.52.0
- - GitHub.com
- - CachyOS Linux 6.17.8-2
+ - [Visual Studio Code](https://code.visualstudio.com/) with the following Extensions:
+   - [XML by Red Hat](https://open-vsx.org/vscode/item?itemName=redhat.vscode-xml)
+   - [Extension Pack for Java by vscjava](https://open-vsx.org/vscode/item?itemName=vscjava.vscode-java-pack)
+   - [Code Spell Checker by Street Side Software](https://open-vsx.org/vscode/item?itemName=streetsidesoftware.code-spell-checker)
+ - [openjdk version 25.0.1](https://openjdk.org/)
+ - [Apache Maven 3.9.11](https://maven.apache.org/)
+ - [git version 2.52.0](https://git-scm.com/about)
+ - [GitHub](https://github.com)
+ - [CachyOS Linux 6.17.8-2](https://cachyos.org/)
 
 # TODO
 1. Create a unit test and automate it through github.
