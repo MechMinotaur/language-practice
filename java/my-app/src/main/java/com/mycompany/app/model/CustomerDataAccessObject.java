@@ -10,9 +10,9 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -66,9 +66,9 @@ public class CustomerDataAccessObject implements CustomerDataAccessor {
 
     private String GetStageUpdatesSql(HttpResponse<String> response) {
 
-        Type listType = new TypeToken<Stack<CustomerModel>>() {
+        Type listType = new TypeToken<ArrayDeque<CustomerModel>>() {
         }.getType();
-        Stack<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
+        ArrayDeque<CustomerModel> customersResponse = gson.fromJson(response.body(), listType);
 
         var stagingSql = """
                 create temp table updatesStaging (
@@ -153,9 +153,7 @@ public class CustomerDataAccessObject implements CustomerDataAccessor {
                 where customer.social = updatesStaging.social
                 """;
 
-        statement.executeUpdate(updateSql);
-
-        return socials.size();
+        return statement.executeUpdate(updateSql);
     }
 
 }
