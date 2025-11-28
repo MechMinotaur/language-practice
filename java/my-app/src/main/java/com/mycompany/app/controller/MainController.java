@@ -8,19 +8,20 @@ public class MainController {
 
     private final CustomerManager customerController;
     private final EventDisplay eventView;
+    private final Scanner scanner;
 
-    public MainController(CustomerManager customerController, EventDisplay eventView) {
+    public MainController(CustomerManager customerController, EventDisplay eventView, Scanner scanner) {
         this.customerController = customerController;
         this.eventView = eventView;
+        this.scanner = scanner;
     }
 
     public void StartMainLoop() {
-        var scanner = new Scanner(System.in);
         var execute = true;
 
         while (execute) {
             this.eventView.LogInfo("Enter 'X' to exit 'L' to list and 'U' to update database.");
-            var command = scanner.nextLine().toUpperCase();
+            var command = this.scanner.nextLine().toUpperCase();
 
             switch (command) {
                 case "X" ->
@@ -34,5 +35,7 @@ public class MainController {
             }
 
         }
+
+        this.scanner.close();
     }
 }
