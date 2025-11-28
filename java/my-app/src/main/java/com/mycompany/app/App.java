@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+import org.sqlite.SQLiteDataSource;
+
 import com.google.gson.Gson;
 import com.mycompany.app.controller.CustomerController;
 import com.mycompany.app.controller.MainController;
@@ -75,8 +77,11 @@ public class App {
       return;
     }
 
+    var ds = new SQLiteDataSource();
+    ds.setUrl("jdbc:sqlite:sample.db");
+
     var dao = new CustomerDataAccessObject(
-        "jdbc:sqlite:sample.db",
+        ds,
         "http://localhost:5000/customers",
         HttpClient.newHttpClient(),
         new Gson());

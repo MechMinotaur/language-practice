@@ -8,7 +8,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,19 +16,25 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.sql.DataSource;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 public class CustomerDataAccessObject implements CustomerDataAccessor {
 
-    private final String localDatabaseUrl;
+    private DataSource sqlDriver;
     private final String remoteRestUrl;
     private final HttpClient httpClient;
     private final Gson gson;
 
-    public CustomerDataAccessObject(String localDatabaseUrl, String remoteRestUrl, HttpClient httpClient, Gson gson) {
-        this.localDatabaseUrl = localDatabaseUrl;
+    public CustomerDataAccessObject(
+            DataSource sqlDriver,
+            String remoteRestUrl,
+            HttpClient httpClient,
+            Gson gson) {
+        this.sqlDriver = sqlDriver;
         this.remoteRestUrl = remoteRestUrl;
         this.httpClient = httpClient;
         this.gson = gson;
@@ -95,7 +100,7 @@ public class CustomerDataAccessObject implements CustomerDataAccessor {
     @Override
     public List<CustomerModel> getAllLocalCustomers() throws SQLException {
         var customers = new ArrayList<CustomerModel>();
-        var connection = DriverManager.getConnection(localDatabaseUrl);
+        var connection = this.sqlDriver.getConnection();
         var statement = connection.createStatement();
         var resultSet = statement.executeQuery("select * from customer");
 
@@ -107,14 +112,15 @@ public class CustomerDataAccessObject implements CustomerDataAccessor {
     }
 
     @Override
-    public int updateLocalCustomers() throws InterruptedException, IOException, JsonSyntaxException, SQLException, URISyntaxException {
+    public int updateLocalCustomers()
+            throws InterruptedException, IOException, JsonSyntaxException, SQLException, URISyntaxException {
         var socials = new ArrayList<Integer>();
         var sqlString = """
                 select social from customer
                 where email is null or phoneNumber is null
                 """;
 
-        var connection = DriverManager.getConnection(localDatabaseUrl);
+        var connection = this.sqlDriver.getConnection();
         var statement = connection.createStatement();
         var resultSet = statement.executeQuery(sqlString);
 
@@ -139,13 +145,13 @@ public class CustomerDataAccessObject implements CustomerDataAccessor {
         statement.executeUpdate(stageUpdatesSql);
 
         var updateSql = """
-                    update customer
-                    set
-                        phoneNumber = coalesce(customer.phoneNumber, updatesStaging.newPhoneNumber),
-                        email = coalesce(customer.email, updatesStaging.newEmail)
-                    from updatesStaging
-                    where customer.social = updatesStaging.social
-                    """;
+                update customer
+                set
+                    phoneNumber = coalesce(customer.phoneNumber, updatesStaging.newPhoneNumber),
+                    email = coalesce(customer.email, updatesStaging.newEmail)
+                from updatesStaging
+                where customer.social = updatesStaging.social
+                """;
 
         statement.executeUpdate(updateSql);
 
