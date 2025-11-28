@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -22,10 +23,15 @@ import com.google.gson.Gson;
 
 public class CustomerDataAccessObjectTest {
     private CustomerDataAccessObject customerDataAccessObject;
-    private DataSource dataSource;
+
     private final String remoteRestUrl = "http://localhost:5000/customers";
     private HttpClient httpClient;
     private Gson gson;
+
+    private DataSource dataSource;
+    private Connection connection;
+    private Statement statement;
+    private ResultSet resultSet;
 
     @BeforeEach
     void Setup() {
@@ -33,43 +39,49 @@ public class CustomerDataAccessObjectTest {
         this.httpClient = Mockito.mock(HttpClient.class);
         this.gson = Mockito.mock(Gson.class);
         this.customerDataAccessObject = new CustomerDataAccessObject(this.dataSource, remoteRestUrl, httpClient, gson);
+
+        this.connection = Mockito.mock(Connection.class);
+        this.statement = Mockito.mock(Statement.class);
+        this.resultSet = Mockito.mock(ResultSet.class);
+    }
+
+    List<CustomerModel> SetupMockDataBase(Iterable<CustomerModel> customers, int numCustomers) throws SQLException {
+        var mockedCustomers = new ArrayList<CustomerModel>();
+        customers.forEach(mockedCustomers::add);
+
+        when(this.dataSource.getConnection()).thenReturn(this.connection);
+        when(this.connection.createStatement()).thenReturn(this.statement);
+        when(this.statement.executeQuery(anyString())).thenReturn(this.resultSet);
+
+        // AtomicInteger since below requires final.
+        final int[] iterations = { numCustomers };
+        when(this.resultSet.next()).thenAnswer(invocation -> {
+            return iterations[0]-- > 0;
+        });
+        when(this.resultSet.getInt("social")).thenAnswer(invocation -> {
+            return mockedCustomers.get(iterations[0]).social();
+        });
+        when(this.resultSet.getString("firstName")).thenAnswer(invocation -> {
+            return mockedCustomers.get(iterations[0]).firstName();
+        });
+        when(this.resultSet.getString("lastName")).thenAnswer(invocation -> {
+            return mockedCustomers.get(iterations[0]).lastName();
+        });
+        when(this.resultSet.getString("email")).thenAnswer(invocation -> {
+            return mockedCustomers.get(iterations[0]).email();
+        });
+        when(this.resultSet.getString("phoneNumber")).thenAnswer(invocation -> {
+            return mockedCustomers.get(iterations[0]).phoneNumber();
+        });
+
+        return mockedCustomers;
     }
 
     @ParameterizedTest
     @MethodSource("com.mycompany.app.TestData#GetCustomerData")
     void TestGetAllLocalCustomersQueriesLocalDatabase(Iterable<CustomerModel> customers, int numCustomers) {
-        var mockConnection = Mockito.mock(Connection.class);
-        var mockStatement = Mockito.mock(Statement.class);
-        var mockResultSet = Mockito.mock(ResultSet.class);
-
-        var mockedCustomers = new ArrayList<CustomerModel>();
-        customers.forEach(mockedCustomers::add);
-
         try {
-            when(this.dataSource.getConnection()).thenReturn(mockConnection);
-            when(mockConnection.createStatement()).thenReturn(mockStatement);
-            when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
-
-            // AtomicInteger since below requires final.
-            final int[] iterations = { numCustomers };
-            when(mockResultSet.next()).thenAnswer(invocation -> {
-                return iterations[0]-- > 0;
-            });
-            when(mockResultSet.getInt("social")).thenAnswer(invocation -> {
-                return mockedCustomers.get(iterations[0]).social();
-            });
-            when(mockResultSet.getString("firstName")).thenAnswer(invocation -> {
-                return mockedCustomers.get(iterations[0]).firstName();
-            });
-            when(mockResultSet.getString("lastName")).thenAnswer(invocation -> {
-                return mockedCustomers.get(iterations[0]).lastName();
-            });
-            when(mockResultSet.getString("email")).thenAnswer(invocation -> {
-                return mockedCustomers.get(iterations[0]).email();
-            });
-            when(mockResultSet.getString("phoneNumber")).thenAnswer(invocation -> {
-                return mockedCustomers.get(iterations[0]).phoneNumber();
-            });
+            var mockedCustomers = this.SetupMockDataBase(customers, numCustomers);
 
             // Act
             var returnedCustomers = this.customerDataAccessObject.getAllLocalCustomers();
