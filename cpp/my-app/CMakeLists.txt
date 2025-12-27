@@ -9,5 +9,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(app_executable main.cpp)
 
+include(cmake/CPM.cmake)
+
 # For distribution:
 install(TARGETS app_executable DESTINATION bin)
+
+CPMAddPackage("gh:nlohmann/json@3.11.3")
+
+target_link_libraries(app_executable nlohmann_json::nlohmann_json)
