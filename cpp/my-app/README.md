@@ -1,17 +1,21 @@
 # my-app
 
 ## Setup and Execution
-1. Install [clang](https://clang.llvm.org/), [cmake](https://cmake.org/), [git](https://git-scm.com/), and [ninja](https://cmake.org/cmake/help/latest/generator/Ninja.html)
+1. Install the following required dependencies:
+    - [clang](https://clang.llvm.org/)
+    - [cmake](https://cmake.org/)
+    - [git](https://git-scm.com/)
+    - [ninja](https://cmake.org/cmake/help/latest/generator/Ninja.html)
 1. Optionally, consider also installing [lldb](https://lldb.llvm.org/) for debugging
 1. Clone this repo
-1. Navigate to this repo from terminal and run
+1. Build the application:
     - `mkdir build`
     - `cd build`
     - `cmake -G Ninja ..`
     - `ninja`
-1. Run the application with `./build/app_executable`
-1. To create a distributable
-    - `cd build`
+1. Run the application: `./build/app_executable`
+1. Distribute the application:
+    - Follow the steps described previously to build the executable
     - `cmake --install . --prefix ./dist`
 
 
@@ -24,6 +28,4 @@
  - [git](https://git-scm.com/about)
  - [GitHub](https://github.com)
  - [CachyOS](https://cachyos.org/)
-
- For debugging and execution I'm using the CMake Tools plugin.
 
