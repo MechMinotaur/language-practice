@@ -1,6 +1,8 @@
 #include "ConsoleLogger.cpp"
+#include "JsonService.cpp"
 // #include "ILogger.hpp"
 #include "MainService.cpp"
+#include <memory>
 // #include <fstream>
 // #include <iostream>
 // #include <memory>
@@ -24,7 +26,9 @@ int main() {
   // std::cout << std::endl;
 
   auto pLogger = std::make_shared<ConsoleLogger>();
-  MainService mainService(pLogger);
+  auto pJsonService = std::make_shared<JsonService>(pLogger);
+
+  MainService mainService(pLogger, pJsonService);
 
   mainService.run();
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IJsonService.hpp"
 #include "ILogger.hpp"
 #include <iostream>
 #include <limits>
@@ -8,6 +9,7 @@
 class MainService {
 private:
   std::shared_ptr<ILogger> logger;
+  std::shared_ptr<IJsonService> jsonService;
 
   int getUserInput() {
     int option;
@@ -31,7 +33,9 @@ private:
   }
 
 public:
-  MainService(std::shared_ptr<ILogger> logger) : logger(std::move(logger)) {}
+  MainService(std::shared_ptr<ILogger> logger,
+              std::shared_ptr<IJsonService> jsonService)
+      : logger(std::move(logger)), jsonService(std::move(jsonService)) {}
 
   void run() {
     logger->log("Main Service Start.");
