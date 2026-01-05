@@ -5,5 +5,6 @@ class ILogger {
 public:
   virtual ~ILogger() = default;
   virtual void log(const std::string &message) = 0;
+  virtual void log(const std::string &message, bool noNewLine) = 0;
   virtual void error(const std::string &message) = 0;
 };
